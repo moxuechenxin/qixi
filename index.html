@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>快乐情人节</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/backgroundA.css"/>
+    <link rel="stylesheet" href="css/backgroundB.css"/>
+    <link rel="stylesheet" href="css/backgroundC.css"/>
+</head>
+<body>
+    <div id="content">
+        <ul class="content-wrap">
+            <li>
+                <!--背景-->
+                <div class="a_background">
+                    <div class="a_background_top"></div>
+                    <div class="a_background_middle"></div>
+                    <div class="a_background_bottom"></div>
+                </div>
+                <!--云朵-->
+                <div class="cloud-wrap">
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                </div>
+                <!-- 太阳-->
+                <div id="sun"></div>
+            </li>
+            <li>
+                <!-- 背景-->
+                <div class="b_background"></div>
+                <!-- .b_background_preload 用于加载点亮灯时的图片加载，，防止开门点灯时出现加载图片资源时画面闪现-->
+                <div class="b_background_preload"></div>
+                <!-- 商店-->
+                <div class="shop">
+                    <div class="door">
+                        <div class="door-left"></div>
+                        <div class="door-right"></div>
+                    </div>
+                    <!-- 灯-->
+                    <div class="lamp"></div>
+                </div>
+                <!-- 小鸟-->
+                <div class="bird"></div>
+            </li>
+            <li>
+                <!-- 背景图-->
+                <div class="c_background">
+                    <div class="c_background_top"></div>
+                    <div class="c_background_middle"></div>
+                    <div class="c_background_bottom"></div>
+                </div>
+                <!-- 小女孩-->
+                <div class="girl"></div>
+                <!-- 水波-->
+                <div class="bridge-bottom">
+                    <div class="water">
+                        <div id="water1"></div>
+                        <div id="water2"></div>
+                        <div id="water3"></div>
+                        <div id="water4"></div>
+                    </div>
+                </div>
+                <!-- 星星-->
+                <ul class="star">
+                    <li class="star1"></li>
+                    <li class="star2"></li>
+                    <li class="star3"></li>
+                    <li class="star4"></li>
+                    <li class="star5"></li>
+                    <li class="star6"></li>
+                </ul>
+                <!-- 慕课网logo图 -->
+                <div class="logo">2.14 情人节快乐</div>
+            </li>
+        </ul>
+        <!-- 飘花 -->
+        <div id="snowflake"></div>
+        <div id="boy" class="charector"></div>
+    </div>
+    <!--<div class="button">-->
+        <!--<button>动画开始</button>-->
+    <!--</div>-->
+
+    <script src="js/jquery-3.2.1.js" charset="utf-8"></script>
+    <script src="js/jquery.transit.js" charset="utf-8"></script>
+    <script src="js/swipe.js"></script>
+    <script src="js/qixi.js"></script>
+    <script>
+        $(function() {
+            var content = $("#content");
+
+            // 音乐配置
+            var audioConfig = {
+                enable: true, // 是否开启音乐
+                playURl: 'music/happy.wav', // 正常播放地址
+                cycleURL: 'music/circulation.wav' // 正常循环播放地址
+            };
+
+            //背景音乐
+            function Hmlt5Audio(url, isloop) {
+                var audio = new Audio(url);
+                audio.autoPlay = true;
+                audio.loop = isloop || false;
+                audio.play();
+                return {
+                    end: function(callback) {
+                        audio.addEventListener('ended', function() {
+                            callback();
+                        }, false);
+                    }
+                };
+            }
+
+            //loge动画 //
+            var logo = {
+                elem: $('.logo'),
+                run: function() {
+                    this.elem.addClass('logolightSpeedIn')
+                            .on(animationEnd, function() {
+                                $(this).addClass('logoshake').off();
+                            });
+                }
+            };
+
+            var snowflakeURl = [
+                'images/snowflake/snowflake1.png',
+                'images/snowflake/snowflake2.png',
+                'images/snowflake/snowflake3.png',
+                'images/snowflake/snowflake4.png',
+                'images/snowflake/snowflake5.png',
+                'images/snowflake/snowflake6.png'
+            ];
+
+            //飘雪花 //
+            function snowflake() {
+                // 雪花容器
+                var $flakeContainer = $('#snowflake');
+
+                // 随机六张图
+                function getImagesName() {
+                    return snowflakeURl[[Math.floor(Math.random() * 6)]];
+                }
+                // 创建一个雪花元素
+                function createSnowBox() {
+                    var url = getImagesName();
+                    return $('<div class="snowbox" />').css({
+                        'width': 41,
+                        'height': 41,
+                        'position': 'absolute',
+                        'backgroundSize': 'cover',
+                        'zIndex': 100000,
+                        'top': '-41px',
+                        'backgroundImage': 'url(' + url + ')'
+                    }).addClass('snowRoll');
+                }
+                // 开始飘花
+                setInterval(function() {
+                    // 运动的轨迹
+                    var startPositionLeft = Math.random() * visualWidth - 100,
+                            startOpacity    = 1,
+                            endPositionTop  = visualHeight - 40,
+                            endPositionLeft = startPositionLeft - 100 + Math.random() * 500,
+                            duration        = visualHeight * 10 + Math.random() * 5000;
+
+                    // 随机透明度，不小于0.5
+                    var randomStart = Math.random();
+                    randomStart = randomStart < 0.5 ? startOpacity : randomStart;
+
+                    // 创建一个雪花
+                    var $flake = createSnowBox();
+
+                    // 设计起点位置
+                    $flake.css({
+                        left: startPositionLeft,
+                        opacity : randomStart
+                    });
+
+                    // 加入到容器
+                    $flakeContainer.append($flake);
+
+                    // 开始执行动画
+                    $flake.transition({
+                        top: endPositionTop,
+                        left: endPositionLeft,
+                        opacity: 0.7
+                    }, duration, 'ease-out', function() {
+                        $(this).remove(); //结束后删除
+                    });
+
+                }, 200);
+            }
+
+
+            // 飞鸟动画
+            var bird = {
+                elem: $('.bird'),
+                fly: function(){
+                    this.elem.addClass('birdFly');
+                    this.elem.transition({
+                        right: content.width()
+                    }, 15000, 'linear');
+                }
+            };
+
+            // 获取位置
+            var getPosition = function (className) {
+                var $elem = $(className);
+                return {
+                    height: $elem.height(),
+                    top: $elem.position().top
+                }
+            };
+
+            // 桥的Y轴
+            var bridgeY = function () {
+                var data = getPosition(".c_background_middle");
+                return data.top;
+            };
+
+            function startRun() {
+                boy.walkTo(6500, 0.5).then(function () {
+                    // 暂停走路
+                    boy.stopWalk();
+                }).then(function () {
+                    // 开门
+                    doorOpen();
+                }).then(function () {
+                    // 开灯
+                    lamp.bright();
+                }).then(function(){
+                    // 进商店
+                    return boy.toShop(2000);
+                }).then(function () {
+                    // 等待取花
+                    return boy.takeFlower();
+                }).then(function(){
+                    // 飞鸟
+                    bird.fly();
+                }).then(function(){
+                    // 出商店
+                    return boy.outShop(2000);
+                }).then(function(){
+                    // 关门
+                    doorClose();
+                }).then(function(){
+                    // 关灯
+                    lamp.dark();
+                }).then(function(){
+                    girl.setOffset(bridgeY());
+                    scrollTo(6500, 2);
+                    return boy.walkTo(6500, 0.15);
+                }).then(function(){
+                    // 第二次走路到桥上left,top
+                    return boy.walkTo(1500, 0.25, (bridgeY() - girl.getHeight()) / visualHeight);
+                }).then(function(){
+                    // 实际走路的比例
+                    var proportionX = (girl.getOffset().left - boy.getWidth() - girl.getWidth() - 100) / visualWidth;
+                    // 第三次桥上直走到小女孩面前
+                    return boy.walkTo(1500, proportionX);
+                }).then(function(){
+                    // 图片还原原地停止状态
+                    boy.resetOriginal();
+                }).then(function(){
+                    // 增加转身动作
+                    setTimeout(function() {
+                        girl.rotate();
+                        boy.rotate(function() {
+                            // 开始logo动画
+                            logo.run();
+                            snowflake();
+                        });
+                    }, 1000);
+                });
+            }
+            // 临时调整页面
+            var swipe = Swipe(container);
+            // 页面滚动到指定区域
+            function scrollTo (time, proportionX) {
+                var distX = visualWidth * proportionX;
+                swipe.scrollTo(distX, time);
+            }
+
+            var boy = BoyWalk();
+
+            // 开始动画
+            var audio1 = Hmlt5Audio(audioConfig.playURl);
+            audio1.end(function() {
+                Hmlt5Audio(audioConfig.cycleURL, true);
+            });
+            // 太阳公转动画
+            $("#sun").addClass('rotation');
+            // 飘云
+            $(".cloud:first").addClass('smallCloud');
+            $(".cloud:last").addClass('largeCloud');
+            //开始第一次走路
+            boy.walkTo(6000, 0.6).then(function(){
+                // 第一次走路完成
+                // 页面开始滚动
+                scrollTo(6500, 1);
+            }).then(function(){
+                // 第二次走路
+                startRun();
+            });
+//            $("button:first").click(function() {
+//                var audio1 = Hmlt5Audio(audioConfig.playURl);
+//                audio1.end(function() {
+//                    Hmlt5Audio(audioConfig.cycleURL, true);
+//                });
+//                // 太阳公转动画
+//                $("#sun").addClass('rotation');
+//                // 飘云
+//                $(".cloud:first").addClass('smallCloud');
+//                $(".cloud:last").addClass('largeCloud');
+//                //开始第一次走路
+//                boy.walkTo(6000, 0.6).then(function(){
+//                    // 第一次走路完成
+//                    // 页面开始滚动
+//                    scrollTo(6500, 1);
+//                }).then(function(){
+//                    // 第二次走路
+//                    startRun();
+//                });
+//            });
+        })
+    </script>
+</body>
+</html>
